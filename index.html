@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>Microsoft Print to PDF 文字化け</title>
+        <link rel="stylesheet" href="./stylesheet.css">
+    </head>
+    <body>
+        <p id="description">
+            Microsoft Print to PDFのタイトルの文字化けはUnicodeの上二桁をないものとして下二桁のみを読んでいるものと仮定して、それを復元するためのツールです。この仮定は必ずしも正しくないようです。選択肢を並べ替えるための漢字のデータは<a href="http://attosoft.info/tools/kanji-checker/">総合漢字チェッカー | 常用漢字や教育漢字などをまとめてチェック | attosoft.info</a>さんからお借りしました。
+        </p>
+        <p>
+            <input type="text" id="input" onChange="make_candidates(this.value);" value="Microsoft Print to PDF 文字化け">
+        </p>
+        <p id="output"></p>
+        <table id="table"></table>
+    </body>
+    <script src="./script.js"></script>
+</html>

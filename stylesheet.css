@@ -1,0 +1,44 @@
+html {
+    text-align: center;
+}
+
+p#description{
+    width: 70%;
+    margin:auto;
+    text-align: left;
+}
+
+input[type=text]{
+    text-align: center;
+    width: 80%;
+    height: 2em;
+}
+
+p#output{
+    display: inline-block;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    height: 2em;
+}
+
+input[type=radio]{
+    display:none;
+}
+
+label{
+    display:inline-block;
+    line-height: 2em;
+    width:2em;
+    height:2em;
+}
+
+input:checked + label{
+    border:2px solid #000;
+    border-radius:2px;
+}
+
+table{
+    margin:auto;
+}
