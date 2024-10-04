@@ -2,22 +2,18 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <title>Microsoft Print to PDF 文字化け</title>
+        <title id="title">Microsoft Print to PDF 文字化け</title>
         <link rel="stylesheet" href="./stylesheet.css">
     </head>
     <body>
         <p id="description">
-            Microsoft Print to PDFのタイトルの文字化けはおおよそUnicodeの下2桁のみにキャストしており、それを復元するためのツールです。ただし下2桁が0x10, 0x13の場合はそれぞれ\n, \rになるため<a href="#0x20">0x20</a>にキャストされています。また<a href="#0xc6">0xc6</a>以上はキャストされません。選択肢を並べ替えるための漢字のデータは<a href="http://attosoft.info/tools/kanji-checker/">総合漢字チェッカー | 常用漢字や教育漢字などをまとめてチェック | attosoft.info</a>さんからお借りしました。
+            Microsoft Print to PDFのタイトルの文字化けを復元するためのツールです。選択肢を並べ替えるための漢字のデータは<a href="http://attosoft.info/tools/kanji-checker/">総合漢字チェッカー | 常用漢字や教育漢字などをまとめてチェック | attosoft.info</a>さんからお借りしました。
         </p>
         <p>
-            <input type="text" id="input" onChange="table_candidates(this.value);" value="Microsoft Print to PDF 文字化け">
+            <input type="text" id="input" onChange="table_candidates(this.value);" value="Microsoft Print to PDF ⁄WQ">
         </p>
         <p id="output"></p>
         <table id="candidates"></table>
-        <b>0x20</b>
-        <table id="0x20"></table>
-        <b>0xc6</b>
-        <table id="0xc6"></table>
     </body>
     <script src="./script.js"></script>
 </html>
