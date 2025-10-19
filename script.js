@@ -1,7 +1,5 @@
 const elem=(id)=>document.getElementById(id);
 
-
-
 const kanji_priority=(char)=>{
     const kanji = [
         '一右雨円王音下火花貝学気九休玉金空月犬見五口校左三山子四糸字耳七車手十出女小上森人水正生青夕石赤千川先早草足村大男竹中虫町天田土二日入年白八百文木本名目立力林六',
@@ -36,60 +34,49 @@ const kanji_priority=(char)=>{
     );
 };
 
-const expand_and_sort=(char)=>Array.from(
-    {length: 256},
-    (_, k)=>k*0x0100+char.charCodeAt(),
-).map(
-    val=>String.fromCharCode(val)
-).sort(
-    (a, b)=>kanji_priority(a)-kanji_priority(b)
-);
-
 const range=(length)=>Array.from(
     {length:length},
     (v,k)=>k,
 );
 
-const shift_jis=(()=>{
-    const decoder = new TextDecoder("shift-jis")
-    return range(128).map(
-        code=>String.fromCharCode(code)
-    ).join("") + range(256).filter(
-        v=> (
-            0x81<= v && v <=0x84
-        ) || (
-            0x87<= v && v <=0x9f
-        ) || (
-            0xe0<= v && v <=0xea
-        ) || (
-            0xed<= v && v <=0xee
-        ) || (
-            0xfa<= v && v <=0xfc
-        )
-    ).map(
-        i=>range(256).filter(
-            v=> 0x40 <= v && v <= 0xfc
+const candidates_list_against_code = (()=>{
+    const shiftjis_all_characters_string=(()=>{
+        const decoder = new TextDecoder("shift-jis")
+        return range(128).map(
+            code=>String.fromCharCode(code)
+        ).join("") + range(256).filter(
+            v=> (
+                0x81<= v && v <=0x84
+            ) || (
+                0x87<= v && v <=0x9f
+            ) || (
+                0xe0<= v && v <=0xea
+            ) || (
+                0xed<= v && v <=0xee
+            ) || (
+                0xfa<= v && v <=0xfc
+            )
         ).map(
-            j=>decoder.decode(new Uint8Array([i, j]))
-        ).filter(
-            char=>char.length===1 && char !== '\ufffd'
+            i=>range(256).filter(
+                v=> 0x40 <= v && v <= 0xfc
+            ).map(
+                j=>decoder.decode(new Uint8Array([i, j]))
+            ).filter(
+                char=>char.length===1 && char !== '\ufffd'
+            ).join("")
         ).join("")
-    ).join("")
-})();
+    })();
 
-const characters = (()=>range(256).map(
-    i=>range(256).map(
-        j=>String.fromCharCode(
-            j*0x0100+i
-        )
-    ).filter(
-        char=>shift_jis.indexOf(char)>-1
-    ).sort(
-        (a,b)=>kanji_priority(a)-kanji_priority(b)
-    ).join("")
-))();
+    const shiftjis_all_characters_list = (()=>range(256).map(
+        i=>range(256).map(
+            j=>String.fromCharCode(
+                j*0x0100+i
+            )
+        ).filter(
+            char=>shiftjis_all_characters_string.indexOf(char)>-1
+        ).join("")
+    ))();
 
-const restore_dict = (()=>{
     const restore_dict = {
         12288:0,
         728:24,
@@ -136,17 +123,18 @@ const restore_dict = (()=>{
         65533:159,
         8364:160,
     };
+    const charlist = shiftjis_all_characters_list;
     Object.keys(restore_dict).forEach(key=>{
-        restore_dict[key]=characters[restore_dict[key]];
+        restore_dict[key]=charlist[restore_dict[key]];
     });
     range(256).forEach(key=>{
-        let chars = characters[key]
-        if ([49, 54, 95, 97, 98, 120].indexOf(key) > -1) chars += characters[22];
-        if ([55, 70, 95, 97, 98, 120].indexOf(key) > -1) chars += characters[127];
-        if ([97, 98].indexOf(key) > -1) chars += (characters[159]+characters[173]);
-        if ([49, 68, 95, 120].indexOf(key) > -1) chars += characters[29];
-        if (key == 95) chars += (characters[124]+`"'*.9;=>[^{}`);
-        if (key == 32) chars += (characters[10]+characters[13]);
+        let chars = charlist[key]
+        if ([49, 54, 95, 97, 98, 120].indexOf(key) > -1) chars += charlist[22];
+        if ([55, 70, 95, 97, 98, 120].indexOf(key) > -1) chars += charlist[127];
+        if ([97, 98].indexOf(key) > -1) chars += (charlist[159]+charlist[173]);
+        if ([49, 68, 95, 120].indexOf(key) > -1) chars += charlist[29];
+        if (key == 95) chars += (charlist[124]+`"'*.9;=>[^{}`);
+        if (key == 32) chars += (charlist[10]+charlist[13]);
         restore_dict[key]=Array.from(
             chars
         ).sort(
@@ -156,10 +144,10 @@ const restore_dict = (()=>{
     return restore_dict;
 })();
 
-const table_candidates=(string)=>{
+update_table=(string)=>{
     const candidates = Array.from(string).map(
-        char=>char.charCodeAt() in restore_dict ?
-            restore_dict[char.charCodeAt()] :
+        char=>char.charCodeAt() in candidates_list_against_code ?
+            candidates_list_against_code[char.charCodeAt()] :
             char
     );
     const tbody = document.createElement("tbody");
@@ -175,17 +163,17 @@ const table_candidates=(string)=>{
             const td = document.createElement("td");
             const id = `${i}-${j}`;
             td.innerHTML = i < chars.length ?
-                `<input type="radio" id="radio_${id}" name="string_${j}" value="${chars[i]}" onChange="reflesh_output();" ${i==0?"checked":""}><label for="radio_${id}">${chars[i]}</label>` :
+                `<input type="radio" id="radio_${id}" name="string_${j}" value="${chars[i]}" onChange="update_output();" ${i==0?"checked":""}><label for="radio_${id}">${chars[i]}</label>` :
                 "";
             tr.append(td);
         });
         tbody.append(tr);
     });
-    elem("candidates").replaceChildren(tbody);
-    reflesh_output();
+    elem("table").replaceChildren(tbody);
+    update_output();
 };
 
-const reflesh_output = () =>{
+update_output = () =>{
     elem("output").innerText = Array.from(
         elem("tr").getElementsByTagName("td")
     ).map(
@@ -199,4 +187,5 @@ const reflesh_output = () =>{
     ).join("");
 };
 
-table_candidates(elem("input").value);
+update_table(elem("input").value);
+

@@ -23,7 +23,7 @@ p#output{
     height: 2em;
 }
 
-input[type=radio]{
+input[type=radio], input[type=checkbox]{
     display:none;
 }
 
@@ -37,6 +37,10 @@ label{
 input:checked + label{
     border:2px solid #000;
     border-radius:2px;
+}
+
+input:disabled + label{
+    background-color: #888;
 }
 
 table{
