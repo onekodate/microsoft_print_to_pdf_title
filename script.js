@@ -135,11 +135,7 @@ const candidates_list_against_code = (()=>{
         if ([49, 68, 95, 120].indexOf(key) > -1) chars += charlist[29];
         if (key == 95) chars += (charlist[124]+`"'*.9;=>[^{}`);
         if (key == 32) chars += (charlist[10]+charlist[13]);
-        restore_dict[key]=Array.from(
-            chars
-        ).sort(
-            (a,b)=>kanji_priority(a)-kanji_priority(b)
-        ).join("")
+        restore_dict[key]=chars;
     });
     return restore_dict;
 })();
@@ -147,7 +143,11 @@ const candidates_list_against_code = (()=>{
 update_table=(string)=>{
     const candidates = Array.from(string).map(
         char=>char.charCodeAt() in candidates_list_against_code ?
-            candidates_list_against_code[char.charCodeAt()] :
+            Array.from(
+                candidates_list_against_code[char.charCodeAt()]
+            ).sort(
+                (a,b)=>kanji_priority(a)-kanji_priority(b)
+            ).join(""):
             char
     );
     const tbody = document.createElement("tbody");
