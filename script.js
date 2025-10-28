@@ -140,7 +140,7 @@ const candidates_list_against_code = (()=>{
     return restore_dict;
 })();
 
-update_table=(string)=>{
+const update_table=(string)=>{
     const candidates = Array.from(string).map(
         char=>char.charCodeAt() in candidates_list_against_code ?
             Array.from(
@@ -173,7 +173,7 @@ update_table=(string)=>{
     update_output();
 };
 
-update_output = () =>{
+const update_output = () =>{
     elem("output").innerText = Array.from(
         elem("tr").getElementsByTagName("td")
     ).map(
